@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DPicsViewer</title>
+  <link rel="stylesheet" href="styles/DPicsViewer.css">
+  <style>
+    ul#DPics{
+      zoom: 1;
+    }
+    ul#DPics:after,
+    ul#DPics:before{
+      content: '';
+      display: table;
+      clear: both;
+    }
+    ul#DPics li{
+      height: 200px;
+      list-style: none;
+      float: left;
+      margin-right: 10px;
+      margin-top: 10px;
+    }
+    ul#DPics img{
+      width: auto;
+      max-height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <ul id="DPics">
+    <li><img src="images/1.jpg"></li>
+    <li><img src="images/2.jpg"></li>
+    <li><img src="images/3.jpg"></li>
+    <li><img src="images/4.jpg"></li>
+    <li><img src="images/5.jpg"></li>
+    <li><img src="images/6.jpg"></li>
+  </ul>
+
+  <script src="scripts/DPicsViewer.js"></script>
+  <script>
+    window.onload = function(){
+      var data = [
+        {
+          src: 'images/1.jpg',
+          title: 'title111',
+          desc: 'Oh!Be my girlfriend111!'
+        },
+        {
+          src: 'images/2.jpg',
+          title: 'title222',
+          desc: 'Oh!Be my girlfriend222!'
+        },
+        {
+          src: 'images/3.jpg',
+          title: 'title333',
+          desc: 'Oh!Be my girlfriend333!'
+        },
+        {
+          src: 'images/4.jpg',
+          title: 'title444',
+          desc: 'Oh!Be my girlfriend444!'
+        },
+        {
+          src: 'images/5.jpg',
+          title: 'title555',
+          desc: 'Oh!Be my girlfriend555!'
+        },
+        {
+          src: 'images/6.jpg',
+          title: 'title666',
+          desc: 'Oh!Be my girlfriend666!'
+        }
+      ];
+      var dpics = new DPicsViewer('DPics',{
+        autoResize: false,
+        showDetail: true
+      });
+      dpics.init(data);
+    }
+  </script>
+</body>
+</html>
