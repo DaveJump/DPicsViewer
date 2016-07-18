@@ -30,11 +30,13 @@
 <body>
   <ul id="DPics">
     <li><img src="images/1.jpg"></li>
-    <li><img src="images/2.jpg"></li>
-    <li><img src="images/3.jpg"></li>
+    <li><img src="images/2.jpeg"></li>
+    <li><img src="images/3.jpeg"></li>
     <li><img src="images/4.jpg"></li>
     <li><img src="images/5.jpg"></li>
-    <li><img src="images/6.jpg"></li>
+    <li><img src="images/6.jpeg"></li>
+    <li><img src="images/7.jpg"></li>
+    <li><img src="images/8.jpg"></li>
   </ul>
 
   <script src="scripts/DPicsViewer.js"></script>
@@ -43,38 +45,51 @@
       var data = [
         {
           src: 'images/1.jpg',
-          title: 'title111',
+          title: 'BEAUTIFUL111',
           desc: 'Oh!Be my girlfriend111!'
         },
         {
-          src: 'images/2.jpg',
-          title: 'title222',
+          src: 'images/2.jpeg',
+          title: 'BEAUTIFUL222',
           desc: 'Oh!Be my girlfriend222!'
         },
         {
-          src: 'images/3.jpg',
-          title: 'title333',
+          src: 'images/3.jpeg',
+          title: 'BEAUTIFUL333',
           desc: 'Oh!Be my girlfriend333!'
         },
         {
           src: 'images/4.jpg',
-          title: 'title444',
+          title: 'BEAUTIFUL444',
           desc: 'Oh!Be my girlfriend444!'
         },
         {
           src: 'images/5.jpg',
-          title: 'title555',
+          title: 'BEAUTIFUL555',
           desc: 'Oh!Be my girlfriend555!'
         },
         {
-          src: 'images/6.jpg',
-          title: 'title666',
+          src: 'images/6.jpeg',
+          title: 'BEAUTIFUL666',
           desc: 'Oh!Be my girlfriend666!'
+        },
+        {
+          src: 'images/7.jpg',
+          title: 'BEAUTIFUL777',
+          desc: 'Oh!Be my girlfriend777!'
+        },
+        {
+          src: 'images/8.jpg',
+          title: 'BEAUTIFUL888',
+          desc: 'Oh!Be my girlfriend888!'
         }
       ];
       var dpics = new DPicsViewer('DPics',{
         autoResize: false,
-        showDetail: true
+        loop: true,
+        keyControl: true,
+        autoPlay: true,
+        autoPlayTime: 3000
       });
       dpics.init(data);
     }
