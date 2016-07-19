@@ -45,13 +45,11 @@
         if(_this.resizeFlag){
           _this.resizeFlag = false;
           window.clearTimeout(timer);
+          window.clearInterval(_this.autoPlayTimer);
           timer = window.setTimeout(function(){
-            if(_this.oImg){
-              _this.oImg.style.opacity = 0;
-              window.setTimeout(function(){
-                _this.resize(_this.oImg);
-              },300);
-            }
+            window.setTimeout(function(){
+              _this.resize(_this.oImg);
+            },300);
           },300);
         }
       }
@@ -131,6 +129,23 @@
       window.clearInterval(_this.autoPlayTimer);
     }
 
+    //rotate
+    this.rotate.onclick = function(){
+      if(_this.toggleFlag){
+        _this.toggleFlag = false;
+        _this.DPicsItem.className += ' inverse';
+        _this.pause.onclick();
+        return false;
+      }
+    }
+    this.rotateBackFace.onclick = function(){
+      _this.DPicsItem.className = _this.DPicsItem.className.replace(' inverse','');
+      window.setTimeout(function(){
+        _this.toggleFlag = true;
+      },500);
+      return false;
+    }
+
     //close
     this.DPicsWrap.onclick = function(e){
       var evt = e || window.event;
@@ -174,9 +189,29 @@
   DPicsViewer.prototype.goto = function(index){
     var _this = this;
     this.nav.style.opacity = 0;
+    this.nav.style.visibility = 'hidden';
+    function findDOMNode(parent,nodeName){
+      var DOMs = parent.children;
+      for(var i = 0;i < DOMs.length;i ++){
+        if(DOMs[i].nodeName === nodeName){
+          return DOMs[i];
+        }
+      }
+    }
     this.preLoadImg(index,function(oImg){
       _this.title.innerHTML = _this.imgDatas[index].title;
       _this.page.innerHTML = '<i>' + parseInt(index + 1) + ' / ' + _this.imgDatas.length + '</i>';
+
+      var desc =  _this.imgDatas[index].desc;
+      var descP = findDOMNode(_this.backface,'P');
+
+      if(!descP){
+        descP = document.createElement('p');
+        descP.innerHTML = desc;
+        _this.backface.appendChild(descP);
+      }else{
+        descP.innerHTML = desc;
+      }
       _this.loading.style.opacity = 0;
       _this.resize(oImg);
     });
@@ -187,6 +222,7 @@
     var _this = this;
     var img = new Image();
     this.oImg.style.opacity = 0;
+    this.oImg.style.visibility = 'hidden';
     this.loading.style.opacity = 1;
 
     window.setTimeout(function(){
@@ -218,8 +254,8 @@
     //scale image
     var scale = Math.min(clientW / w ,clientH / h ,1);
 
-    w = scale < 1 ? Math.ceil(w * scale - 20) : Math.ceil(w * scale);
-    h = scale < 1 ? Math.ceil(h * scale - 20) : Math.ceil(h * scale);
+    w = scale < 1 ? Math.ceil(w * scale - 60) : Math.ceil(w * scale);
+    h = scale < 1 ? Math.ceil(h * scale - 60) : Math.ceil(h * scale);
     oImg.style.width = w + 'px';
     oImg.style.height = h + 'px';
     this.DPicsItem.style.width = w + 'px';
@@ -229,9 +265,11 @@
 
     window.setTimeout(function(){
       oImg.style.opacity = 1;
+      oImg.style.visibility = 'visible';
       _this.resizeFlag = true;
       _this.toggleFlag = true;
       _this.nav.style.opacity = 1;
+      _this.nav.style.visibility = 'visible';
       !_this.isPause && _this.autoPlay();
     },500);
   }
@@ -255,6 +293,9 @@
                         '<div class="rect5"></div>' +
                       '</div>' +
                     '</div>'+
+                    '<div id="DPics-back-face" class="face-desc">' +
+                      '<div id="DPics-rotate-backFace" class="DPics-rotate"></div>' +
+                    '</div>' +
                  '</div>' +
                  '<div id="DPics-nav" class="DPics-nav">' +
                     '<div id="DPicsPlay" class="DPics-play-pause play"></div>' +
@@ -285,6 +326,9 @@
     this.play = getById('DPicsPlay');
     this.pause = getById('DPicsPause');
     this.loading = getById('DPics-loading');
+    this.rotate = getById('DPics-rotate');
+    this.rotateBackFace = getById('DPics-rotate-backFace');
+    this.backface = getById('DPics-back-face');
 
     if(!this.config.showNav){
       this.nav.style.display = 'none';
