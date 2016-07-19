@@ -34,8 +34,8 @@
 
     var timer = null;
     this.autoPlayTimer = null;
-    this.isPause = false;
-    this.isInit = false;
+    this.isPaused = false;
+    this.isInited = false;
     this.resizeFlag = true;
     this.toggleFlag = true;
 
@@ -74,13 +74,14 @@
         _this.goto(_this.cindex);
         return false;
       }
-    }
+    };
 
     //prev
     this.prev.onclick = function(){
       window.clearInterval(_this.autoPlayTimer);
       if(_this.toggleFlag){
         _this.toggleFlag = false;
+
         if(!_this.config.loop){
           if(_this.cindex === 0){
             _this.toggleFlag = true;
@@ -95,39 +96,39 @@
         _this.goto(_this.cindex);
         return false;
       }
-    }
+    };
 
     //keyControl
     if(this.config.keyControl && this.config.switchItem){
-      window.onkeyup = function(e){
-        if(_this.isInit){
+      window.addEventListener('keyup', function (e) {
+        if (_this.isInited) {
           var evt = e || window.event;
           var keyValue = evt.which;
 
-          if(keyValue == 38 || keyValue == 37){
+          if (keyValue == 38 || keyValue == 37) {
             _this.prev.onclick();
-          }else if(keyValue == 39 || keyValue == 40){
+          } else if (keyValue == 39 || keyValue == 40) {
             _this.next.onclick();
           }
         }
-      }
+      }, false);
     }
 
     //play
     this.play.onclick = function(){
       this.style.display = 'none';
       _this.pause.style.display = 'block';
-      _this.isPause = false;
+      _this.isPaused = false;
       _this.autoPlay();
-    }
+    };
 
     //pause
     this.pause.onclick = function(){
       _this.play.style.display = 'block';
       this.style.display = 'none';
-      _this.isPause = true;
+      _this.isPaused = true;
       window.clearInterval(_this.autoPlayTimer);
-    }
+    };
 
     //rotate
     this.rotate.onclick = function(){
@@ -135,15 +136,32 @@
         _this.toggleFlag = false;
         _this.DPicsItem.className += ' inverse';
         _this.pause.onclick();
+        if(!_this.config.autoPlay || !_this.config.switchItem){
+          _this.play.style.display = _this.pause.style.display = 'none';
+        }
         return false;
       }
-    }
+    };
     this.rotateBackFace.onclick = function(){
       _this.DPicsItem.className = _this.DPicsItem.className.replace(' inverse','');
       window.setTimeout(function(){
         _this.toggleFlag = true;
       },500);
       return false;
+    };
+
+    //touchSwitch
+    if(this.config.touchSwitch && this.config.switchItem){
+      this.swipe(this.oBox,function(result){
+        switch (result){
+          case 'swipeLeft':
+            _this.next.onclick();
+            break;
+          case 'swipeRight':
+            _this.prev.onclick();
+            break;
+        }
+      });
     }
 
     //close
@@ -151,7 +169,7 @@
       var evt = e || window.event;
       if(evt.target === evt.currentTarget){
         this.style.display = 'none';
-        _this.isInit = false;
+        _this.isInited = false;
         _this.DPicsItem.style.width = _this.DPicsItem.style.height = 200 + 'px';
         _this.DPicsItem.style.marginLeft = _this.DPicsItem.style.marginTop = -100 + 'px';
         window.clearInterval(_this.autoPlayTimer);
@@ -159,32 +177,87 @@
     }
   }
 
+  DPicsViewer.prototype.swipe = function(obj,callback){
+    var startPoint = 0;
+    var endPoint = 0;
+    var startDate,endDate = null;
+
+    obj.addEventListener('touchmove',function(e){
+      var evt = e || window.event;
+      evt.preventDefault();
+    },false);
+    obj.addEventListener('touchstart',function(e){
+
+      var evt = e || window.event;
+      startPoint = evt.touches[0].pageX;
+      startDate = new Date() * 1;
+    },false);
+    obj.addEventListener('touchend',function(e){
+      var evt = e || window.event;
+      endPoint = evt.changedTouches[0].pageX;
+      endDate = new Date() * 1;
+
+      if(callback){
+        if((endDate - startDate) < 100){
+          if((endPoint - startPoint) < 0){
+            callback('swipeLeft');
+          }else if((endPoint - startPoint) > 0){
+            callback('swipeRight');
+          }
+        }else if((endDate - startDate) < 500){
+          if((endPoint - startPoint) < -50){
+            callback('swipeLeft');
+          }else if((endPoint - startPoint) > 50){
+            callback('swipeRight');
+          }
+        }
+      }
+    },false);
+  };
+
   DPicsViewer.prototype.autoPlay = function(){
     var _this = this;
     //autoPlay
-    if(this.config.autoPlay && this.isInit){
+    if(this.config.autoPlay && this.isInited && this.config.switchItem){
       this.autoPlayTimer = window.setInterval(function(){
         _this.next.onclick();
       },_this.config.autoPlayTime);
     }
-  }
+  };
 
   DPicsViewer.prototype.init = function(data){
     var _this = this;
     this.imgDatas = data;
-    var imgItems = this.oWrap.getElementsByTagName('li');
+    var imgItems = this.oWrap.getElementsByTagName('img');
+    var realItems = findImgObj();
 
-    for(var i = 0;i < imgItems.length;i ++){
-      imgItems[i].index = i;
-      imgItems[i].onclick = function(){
-        _this.isInit = true;
-        _this.cindex = parseInt(this.index);
-        _this.DPicsItem.className = 'DPics-item animated fadeIn';
-        _this.goto(_this.cindex);
-        return false;
+    function findImgObj(){
+      var itemArr = [];
+      for(var i = 0;i < imgItems.length;i ++){
+        if(imgItems[i].className.indexOf('DPics-item') > -1){
+          itemArr.push(imgItems[i]);
+        }
       }
+      return itemArr;
     }
-  }
+
+    realItems.forEach(function(item,idx){
+      item.index = idx;
+    });
+
+    this.oWrap.addEventListener('click',function(e){
+      var evt = e || window.event;
+      var target = evt.target;
+
+      if(target === evt.currentTarget){
+        return false;
+      }else if(target.nodeName === 'IMG' && target.className.indexOf('DPics-item') > -1){
+        _this.cindex = parseInt(target.index);
+        _this.DPicsItem.className = 'DPics-box animated fadeIn';
+        _this.goto(_this.cindex);
+      }
+    },false);
+  };
 
   DPicsViewer.prototype.goto = function(index){
     var _this = this;
@@ -199,10 +272,10 @@
       }
     }
     this.preLoadImg(index,function(oImg){
-      _this.title.innerHTML = _this.imgDatas[index].title;
+      _this.title.innerHTML = _this.imgDatas[index].title || '';
       _this.page.innerHTML = '<i>' + parseInt(index + 1) + ' / ' + _this.imgDatas.length + '</i>';
 
-      var desc =  _this.imgDatas[index].desc;
+      var desc = _this.imgDatas[index].desc || '';
       var descP = findDOMNode(_this.backface,'P');
 
       if(!descP){
@@ -216,7 +289,7 @@
       _this.resize(oImg);
     });
     this.DPicsWrap.style.display = 'block';
-  }
+  };
 
   DPicsViewer.prototype.preLoadImg = function(index,callback){
     var _this = this;
@@ -240,7 +313,7 @@
         };
       }
     },300);
-  }
+  };
 
   DPicsViewer.prototype.resize = function(oImg){
     var _this = this;
@@ -268,23 +341,24 @@
       oImg.style.visibility = 'visible';
       _this.resizeFlag = true;
       _this.toggleFlag = true;
+      _this.isInited = true;
       _this.nav.style.opacity = 1;
       _this.nav.style.visibility = 'visible';
-      !_this.isPause && _this.autoPlay();
+      !_this.isPaused && _this.autoPlay();
     },500);
-  }
+  };
 
   DPicsViewer.prototype.renderDOM = function(){
     this.DPicsWrap = document.createElement('div');
     this.DPicsWrap.id = this.oWrap.id + '-pop';
-    this.DPicsWrap.className = 'DPicsBox';
+    this.DPicsWrap.className = 'DPics-wrap';
 
     this.DPicsItem = document.createElement('div');
-    this.DPicsItem.className = 'DPics-item';
+    this.DPicsItem.className = 'DPics-box';
 
-    var strDOM = '<div id="DPics-imgBox" class="DPics-imgBox">' +
-                    '<img id="DPics-img">' +
-                    '<div id="DPics-loading" class="DPics-loading">' +
+    var strDOM = '<div id="'+ this.oWrap.id +'-DPics-imgBox" class="DPics-imgBox">' +
+                    '<img id="'+ this.oWrap.id +'-DPics-img">' +
+                    '<div id="'+ this.oWrap.id +'-DPics-loading" class="DPics-loading">' +
                       '<div class="DPics-spinner">' +
                         '<div class="rect1"></div>' +
                         '<div class="rect2"></div>' +
@@ -293,20 +367,20 @@
                         '<div class="rect5"></div>' +
                       '</div>' +
                     '</div>'+
-                    '<div id="DPics-back-face" class="face-desc">' +
-                      '<div id="DPics-rotate-backFace" class="DPics-rotate"></div>' +
+                    '<div id="'+ this.oWrap.id +'-DPics-backFace" class="face-desc">' +
+                      '<div id="'+ this.oWrap.id +'-DPics-rotate-backFace" class="DPics-rotate-backFace"></div>' +
                     '</div>' +
                  '</div>' +
-                 '<div id="DPics-nav" class="DPics-nav">' +
-                    '<div id="DPicsPlay" class="DPics-play-pause play"></div>' +
-                    '<div id="DPicsPause" class="DPics-play-pause pause"></div>' +
-                    '<div id="DPics-prev" class="DPics-prev-next-btn prev-btn"></div>' +
-                    '<div id="DPics-next" class="DPics-prev-next-btn next-btn"></div>' +
+                 '<div id="'+ this.oWrap.id +'-DPics-nav" class="DPics-nav">' +
+                    '<div id="'+ this.oWrap.id +'-DPicsPlay" class="DPics-play-pause play"></div>' +
+                    '<div id="'+ this.oWrap.id +'-DPicsPause" class="DPics-play-pause pause"></div>' +
+                    '<div id="'+ this.oWrap.id +'-DPics-prev" class="DPics-prev-next-btn prev-btn"></div>' +
+                    '<div id="'+ this.oWrap.id +'-DPics-next" class="DPics-prev-next-btn next-btn"></div>' +
                     '<div class="DPics-detail">' +
-                        '<span id="DPics-page" class="DPics-page"></span>' +
-                        '<span id="DPics-title" class="DPics-title"></span>' +
+                        '<span id="'+ this.oWrap.id +'-DPics-page" class="DPics-page"></span>' +
+                        '<span id="'+ this.oWrap.id +'-DPics-title" class="DPics-title"></span>' +
                     '</div>' +
-                    '<div id="DPics-rotate" class="DPics-rotate"</div>' +
+                    '<div id="'+ this.oWrap.id +'-DPics-rotate" class="DPics-rotate"</div>' +
                  '</div>';
 
     this.DPicsWrap.appendChild(this.DPicsItem);
@@ -317,18 +391,19 @@
       return document.getElementById(id);
     }
 
-    this.oImg = getById('DPics-img');
-    this.nav = getById('DPics-nav');
-    this.page = getById('DPics-page');
-    this.title = getById('DPics-title');
-    this.prev = getById('DPics-prev');
-    this.next = getById('DPics-next');
-    this.play = getById('DPicsPlay');
-    this.pause = getById('DPicsPause');
-    this.loading = getById('DPics-loading');
-    this.rotate = getById('DPics-rotate');
-    this.rotateBackFace = getById('DPics-rotate-backFace');
-    this.backface = getById('DPics-back-face');
+    this.oBox = getById(''+ this.oWrap.id +'-DPics-imgBox');
+    this.oImg = getById(''+ this.oWrap.id +'-DPics-img');
+    this.nav = getById(''+ this.oWrap.id +'-DPics-nav');
+    this.page = getById(''+ this.oWrap.id +'-DPics-page');
+    this.title = getById(''+ this.oWrap.id +'-DPics-title');
+    this.prev = getById(''+ this.oWrap.id +'-DPics-prev');
+    this.next = getById(''+ this.oWrap.id +'-DPics-next');
+    this.play = getById(''+ this.oWrap.id +'-DPicsPlay');
+    this.pause = getById(''+ this.oWrap.id +'-DPicsPause');
+    this.loading = getById(''+ this.oWrap.id +'-DPics-loading');
+    this.rotate = getById(''+ this.oWrap.id +'-DPics-rotate');
+    this.rotateBackFace = getById(''+ this.oWrap.id +'-DPics-rotate-backFace');
+    this.backface = getById(''+ this.oWrap.id +'-DPics-backFace');
 
     if(!this.config.showNav){
       this.nav.style.display = 'none';
@@ -340,8 +415,8 @@
       this.play.style.display = 'none';
     }
 
-    if(!this.config.autoPlay){
-      this.prev.style.display = this.pause.style.display = 'none';
+    if(!this.config.autoPlay || !this.config.switchItem){
+      this.play.style.display = this.pause.style.display = 'none';
     }else{
       this.play.style.display = 'none';
       this.pause.style.display = 'block';

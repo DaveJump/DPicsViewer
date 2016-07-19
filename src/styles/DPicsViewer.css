@@ -259,7 +259,7 @@ th {
   animation-name: fadeIn;
 }
 
-.DPicsBox {
+.DPics-wrap {
   perspective: 1300px;
   display: none;
   z-index: 9999;
@@ -270,7 +270,7 @@ th {
   left: 0;
   background: rgba(0, 0, 0, 0.7);
 }
-.DPics-item {
+.DPics-box {
   position: relative;
   opacity: 0;
   position: absolute;
@@ -295,7 +295,7 @@ th {
   transition: width, height, transform, 0.5s;
   transform-style: preserve-3d;
 }
-.DPics-item img {
+.DPics-box img {
   z-index: 90000;
   display: block;
   -moz-transition: opacity, visibility, 0.3s;
@@ -304,7 +304,7 @@ th {
   transition: opacity, visibility, 0.3s;
 }
 
-.DPics-item.inverse {
+.DPics-box.inverse {
   -moz-transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
   transform: rotateY(180deg);
@@ -333,7 +333,7 @@ th {
   border-radius: 3px;
 }
 
-.DPics-rotate {
+.DPics-rotate, .DPics-rotate-backFace {
   cursor: pointer;
   float: right;
   width: 36px;
@@ -343,11 +343,11 @@ th {
   background-size: 24px 24px;
   opacity: .7;
 }
-.DPics-rotate:hover {
+.DPics-rotate:hover, .DPics-rotate-backFace:hover {
   opacity: 1;
 }
 
-#DPics-rotate-backFace {
+.DPics-rotate-backFace {
   float: none;
   position: absolute;
   bottom: 10px;

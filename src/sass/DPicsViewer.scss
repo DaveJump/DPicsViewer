@@ -45,7 +45,7 @@
   animation-name: fadeIn;
 }
 
-.DPicsBox{
+.DPics-wrap{
   perspective: 1300px;
   display: none;
   z-index: 9999;
@@ -53,7 +53,7 @@
   background: rgba(0,0,0,.7);
 
   @at-root {
-    .DPics-item{
+    .DPics-box{
       position: relative;
       opacity: 0;
       @include stretch(50%,auto,auto,50%);
@@ -74,7 +74,7 @@
         @include transition(opacity,visibility,.3s);
       }
     }
-    .DPics-item.inverse{
+    .DPics-box.inverse{
       @include rotateY(180deg);
     }
 
@@ -108,7 +108,8 @@
         opacity: 1;
       }
     }
-    #DPics-rotate-backFace{
+    .DPics-rotate-backFace{
+      @extend .DPics-rotate;
       float: none;
       position: absolute;
       bottom: 10px;
