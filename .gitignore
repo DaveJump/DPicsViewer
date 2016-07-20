@@ -2,5 +2,6 @@
 .sass-cache
 node_modules
 bower_components
-dist
+#dist
 build
+demo

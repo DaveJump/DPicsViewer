@@ -7,8 +7,8 @@ var uglify = require('gulp-uglify');
 var csso = require('gulp-csso');
 
 gulp.task('dist',function(){
-  var jsMin = gulp.src('src/script/DPicsViewer.js');
-  var cssMin = gulp.src('src/style/DPicsViewer.css');
+  var jsMin = gulp.src('src/scripts/DPicsViewer.js');
+  var cssMin = gulp.src('src/styles/DPicsViewer.css');
 
   jsMin.pipe(uglify()).pipe(gulp.dest('dist'));
   cssMin.pipe(csso()).pipe(gulp.dest('dist'));
