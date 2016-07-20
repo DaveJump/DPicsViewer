@@ -15,9 +15,9 @@
       loop: false,
       autoPlay: false,
       autoPlayTime: 5000,
-      switchItem: true,
+      singleMode: false,
       touchSwitch: true,
-      autoResize: true,
+      autoResize: false,
       keyControl: false,
       showNav: true
     };
@@ -41,23 +41,22 @@
 
     //autoResize imageBox when resizing window
     if(this.config.autoResize){
-      window.onresize = function(){
+      window.addEventListener('resize',function(){
         if(_this.resizeFlag){
           _this.resizeFlag = false;
           window.clearTimeout(timer);
-          window.clearInterval(_this.autoPlayTimer);
           timer = window.setTimeout(function(){
-            window.setTimeout(function(){
-              _this.resize(_this.oImg);
-            },300);
-          },300);
+            window.clearTimeout(_this.autoPlayTimer);
+            _this.isPaused = true;
+            _this.resize(_this.oImg);
+          },400);
         }
-      }
+      },false);
     }
 
     //next
     this.next.onclick = function(){
-      window.clearInterval(_this.autoPlayTimer);
+      window.clearTimeout(_this.autoPlayTimer);
       if(_this.toggleFlag){
         _this.toggleFlag = false;
         if(!_this.config.loop){
@@ -78,7 +77,7 @@
 
     //prev
     this.prev.onclick = function(){
-      window.clearInterval(_this.autoPlayTimer);
+      window.clearTimeout(_this.autoPlayTimer);
       if(_this.toggleFlag){
         _this.toggleFlag = false;
 
@@ -99,7 +98,7 @@
     };
 
     //keyControl
-    if(this.config.keyControl && this.config.switchItem){
+    if(this.config.keyControl && !this.config.singleMode){
       window.addEventListener('keyup', function (e) {
         if (_this.isInited) {
           var evt = e || window.event;
@@ -127,31 +126,11 @@
       _this.play.style.display = 'block';
       this.style.display = 'none';
       _this.isPaused = true;
-      window.clearInterval(_this.autoPlayTimer);
-    };
-
-    //rotate
-    this.rotate.onclick = function(){
-      if(_this.toggleFlag){
-        _this.toggleFlag = false;
-        _this.DPicsItem.className += ' inverse';
-        _this.pause.onclick();
-        if(!_this.config.autoPlay || !_this.config.switchItem){
-          _this.play.style.display = _this.pause.style.display = 'none';
-        }
-        return false;
-      }
-    };
-    this.rotateBackFace.onclick = function(){
-      _this.DPicsItem.className = _this.DPicsItem.className.replace(' inverse','');
-      window.setTimeout(function(){
-        _this.toggleFlag = true;
-      },500);
-      return false;
+      window.clearTimeout(_this.autoPlayTimer);
     };
 
     //touchSwitch
-    if(this.config.touchSwitch && this.config.switchItem){
+    if(this.config.touchSwitch && !this.config.singleMode){
       this.swipe(this.oBox,function(result){
         switch (result){
           case 'swipeLeft':
@@ -168,12 +147,18 @@
     this.DPicsWrap.onclick = function(e){
       var evt = e || window.event;
       if(evt.target === evt.currentTarget){
-        this.style.display = 'none';
-        _this.isInited = false;
-        _this.DPicsItem.style.width = _this.DPicsItem.style.height = 200 + 'px';
-        _this.DPicsItem.style.marginLeft = _this.DPicsItem.style.marginTop = -100 + 'px';
-        window.clearInterval(_this.autoPlayTimer);
+        _this.close.onclick();
       }
+    };
+    this.close.onclick = function(){
+      _this.isPaused = true;
+      _this.isInited = false;
+      _this.DPicsWrap.style.display = 'none';
+      _this.DPicsBox.style.opacity = 0;
+      _this.DPicsBox.style.width = _this.DPicsBox.style.height = 200 + 'px';
+      _this.DPicsBox.style.marginLeft = _this.DPicsBox.style.marginTop = -100 + 'px';
+      window.clearTimeout(_this.autoPlayTimer);
+      return false;
     }
   }
 
@@ -218,14 +203,17 @@
   DPicsViewer.prototype.autoPlay = function(){
     var _this = this;
     //autoPlay
-    if(this.config.autoPlay && this.isInited && this.config.switchItem){
-      this.autoPlayTimer = window.setInterval(function(){
+    if(this.config.autoPlay && this.isInited && !this.config.singleMode){
+      this.autoPlayTimer = window.setTimeout(function(){
         _this.next.onclick();
       },_this.config.autoPlayTime);
     }
   };
 
   DPicsViewer.prototype.init = function(data){
+    if(!data || !(data instanceof Array) || data.length < 1){
+      throw new Error('error caused when initializing constructor. Initial data should be an [Array] type and it\'s length should be more than one');
+    }
     var _this = this;
     this.imgDatas = data;
     var imgItems = this.oWrap.getElementsByTagName('img');
@@ -245,7 +233,7 @@
       item.index = idx;
     });
 
-    this.oWrap.addEventListener('click',function(e){
+    var initHandler = function(e){
       var evt = e || window.event;
       var target = evt.target;
 
@@ -253,39 +241,27 @@
         return false;
       }else if(target.nodeName === 'IMG' && target.className.indexOf('DPics-item') > -1){
         _this.cindex = parseInt(target.index);
-        _this.DPicsItem.className = 'DPics-box animated fadeIn';
+        window.setTimeout(function(){
+          _this.DPicsBox.style.opacity = 1;
+        },50);
         _this.goto(_this.cindex);
       }
-    },false);
+    };
+    this.oWrap.removeEventListener('click',initHandler,false);
+    this.oWrap.addEventListener('click',initHandler,false);
   };
 
   DPicsViewer.prototype.goto = function(index){
     var _this = this;
     this.nav.style.opacity = 0;
     this.nav.style.visibility = 'hidden';
-    function findDOMNode(parent,nodeName){
-      var DOMs = parent.children;
-      for(var i = 0;i < DOMs.length;i ++){
-        if(DOMs[i].nodeName === nodeName){
-          return DOMs[i];
-        }
-      }
-    }
+    _this.desc.className = 'DPics-desc';
     this.preLoadImg(index,function(oImg){
-      _this.title.innerHTML = _this.imgDatas[index].title || '';
-      _this.page.innerHTML = '<i>' + parseInt(index + 1) + ' / ' + _this.imgDatas.length + '</i>';
-
-      var desc = _this.imgDatas[index].desc || '';
-      var descP = findDOMNode(_this.backface,'P');
-
-      if(!descP){
-        descP = document.createElement('p');
-        descP.innerHTML = desc;
-        _this.backface.appendChild(descP);
-      }else{
-        descP.innerHTML = desc;
-      }
       _this.loading.style.opacity = 0;
+      _this.page.innerHTML = '<i>' + parseInt(_this.cindex + 1) + ' / ' + _this.imgDatas.length + '</i>';
+      _this.title.innerHTML = _this.imgDatas[_this.cindex].title || '';
+      _this.desc.innerHTML = _this.imgDatas[_this.cindex].desc || '';
+      !_this.imgDatas[_this.cindex].desc ? (_this.desc.style.display = 'none') : (_this.desc.style.display = 'block');
       _this.resize(oImg);
     });
     this.DPicsWrap.style.display = 'block';
@@ -300,18 +276,9 @@
 
     window.setTimeout(function(){
       _this.oImg.src = img.src = _this.imgDatas[index].src;
-
-      if(window.ActiveXObject){
-        img.onreadystatechange = function(){
-          if(_this.readyState == "complete"){
-            callback && callback(_this.oImg);
-          }
-        }
-      }else{
-        img.onload = function(){
-          callback && callback(_this.oImg);
-        };
-      }
+      img.onload = function(){
+        callback && callback(_this.oImg);
+      };
     },300);
   };
 
@@ -319,11 +286,10 @@
     var _this = this;
     var clientW = document.documentElement.clientWidth;
     var clientH = document.documentElement.clientHeight;
-    oImg.style.width = 'auto';
-    oImg.style.height = 'auto';
+    oImg.style.width = oImg.style.height = 'auto';
     var w = oImg.width;
     var h = oImg.height;
-
+    var navH = clientW < 470 ? 83 : 45;
     //scale image
     var scale = Math.min(clientW / w ,clientH / h ,1);
 
@@ -331,19 +297,22 @@
     h = scale < 1 ? Math.ceil(h * scale - 60) : Math.ceil(h * scale);
     oImg.style.width = w + 'px';
     oImg.style.height = h + 'px';
-    this.DPicsItem.style.width = w + 'px';
-    this.DPicsItem.style.height = this.config.showNav ? h + 43 + 'px' : h + 'px';
-    this.DPicsItem.style.marginLeft = - (w + 10) / 2 + 'px';
-    this.DPicsItem.style.marginTop = this.config.showNav ? (- (h + 43 + 10) / 2 + 'px') : (- (h + 10) / 2 + 'px');
+    this.DPicsBox.style.width = w + 'px';
+    this.DPicsBox.style.height = this.config.showNav ? h + navH + 'px' : h + 'px';
+    this.DPicsBox.style.marginLeft = - (w + 10) / 2 + 'px';
+    this.DPicsBox.style.marginTop = this.config.showNav ? (- (h + navH + 10) / 2 + 'px') : (- (h + 10) / 2 + 'px');
 
+    if(_this.isPaused && _this.config.autoPlay){
+      _this.play.style.display = 'block';
+      _this.pause.style.display = 'none';
+    }
     window.setTimeout(function(){
-      oImg.style.opacity = 1;
-      oImg.style.visibility = 'visible';
+      _this.nav.style.opacity = oImg.style.opacity = 1;
+      _this.nav.style.visibility = oImg.style.visibility = 'visible';
+      _this.desc.className = 'DPics-desc show-desc';
       _this.resizeFlag = true;
       _this.toggleFlag = true;
       _this.isInited = true;
-      _this.nav.style.opacity = 1;
-      _this.nav.style.visibility = 'visible';
       !_this.isPaused && _this.autoPlay();
     },500);
   };
@@ -353,38 +322,36 @@
     this.DPicsWrap.id = this.oWrap.id + '-pop';
     this.DPicsWrap.className = 'DPics-wrap';
 
-    this.DPicsItem = document.createElement('div');
-    this.DPicsItem.className = 'DPics-box';
+    this.DPicsBox = document.createElement('div');
+    this.DPicsBox.className = 'DPics-box';
 
     var strDOM = '<div id="'+ this.oWrap.id +'-DPics-imgBox" class="DPics-imgBox">' +
                     '<img id="'+ this.oWrap.id +'-DPics-img">' +
-                    '<div id="'+ this.oWrap.id +'-DPics-loading" class="DPics-loading">' +
-                      '<div class="DPics-spinner">' +
-                        '<div class="rect1"></div>' +
-                        '<div class="rect2"></div>' +
-                        '<div class="rect3"></div>' +
-                        '<div class="rect4"></div>' +
-                        '<div class="rect5"></div>' +
-                      '</div>' +
-                    '</div>'+
-                    '<div id="'+ this.oWrap.id +'-DPics-backFace" class="face-desc">' +
-                      '<div id="'+ this.oWrap.id +'-DPics-rotate-backFace" class="DPics-rotate-backFace"></div>' +
-                    '</div>' +
+                    '<p id="'+ this.oWrap.id +'-DPics-desc" class="DPics-desc"></p>' +
                  '</div>' +
+                 '<div id="'+ this.oWrap.id +'-DPics-loading" class="DPics-loading">' +
+                   '<div class="DPics-spinner">' +
+                     '<div class="rect1"></div>' +
+                     '<div class="rect2"></div>' +
+                     '<div class="rect3"></div>' +
+                     '<div class="rect4"></div>' +
+                     '<div class="rect5"></div>' +
+                   '</div>' +
+                 '</div>'+
                  '<div id="'+ this.oWrap.id +'-DPics-nav" class="DPics-nav">' +
-                    '<div id="'+ this.oWrap.id +'-DPicsPlay" class="DPics-play-pause play"></div>' +
-                    '<div id="'+ this.oWrap.id +'-DPicsPause" class="DPics-play-pause pause"></div>' +
-                    '<div id="'+ this.oWrap.id +'-DPics-prev" class="DPics-prev-next-btn prev-btn"></div>' +
-                    '<div id="'+ this.oWrap.id +'-DPics-next" class="DPics-prev-next-btn next-btn"></div>' +
-                    '<div class="DPics-detail">' +
-                        '<span id="'+ this.oWrap.id +'-DPics-page" class="DPics-page"></span>' +
-                        '<span id="'+ this.oWrap.id +'-DPics-title" class="DPics-title"></span>' +
+                    '<div id="'+ this.oWrap.id +'-DPics-close" class="DPics-close"></div>' +
+                    '<div class="DPics-control">' +
+                      '<div id="'+ this.oWrap.id +'-DPicsPlay" class="DPics-play-pause play"></div>' +
+                      '<div id="'+ this.oWrap.id +'-DPicsPause" class="DPics-play-pause pause"></div>' +
+                      '<div id="'+ this.oWrap.id +'-DPics-prev" class="DPics-prev-next-btn prev-btn"></div>' +
+                      '<div id="'+ this.oWrap.id +'-DPics-next" class="DPics-prev-next-btn next-btn"></div>' +
+                      '<span id="'+ this.oWrap.id +'-DPics-page" class="DPics-page"></span>' +
                     '</div>' +
-                    '<div id="'+ this.oWrap.id +'-DPics-rotate" class="DPics-rotate"</div>' +
+                    '<p id="'+ this.oWrap.id +'-DPics-title" class="DPics-title"></p>' +
                  '</div>';
 
-    this.DPicsWrap.appendChild(this.DPicsItem);
-    this.DPicsItem.innerHTML = strDOM;
+    this.DPicsWrap.appendChild(this.DPicsBox);
+    this.DPicsBox.innerHTML = strDOM;
     document.body.appendChild(this.DPicsWrap);
 
     function getById(id){
@@ -396,26 +363,25 @@
     this.nav = getById(''+ this.oWrap.id +'-DPics-nav');
     this.page = getById(''+ this.oWrap.id +'-DPics-page');
     this.title = getById(''+ this.oWrap.id +'-DPics-title');
+    this.desc = getById(''+ this.oWrap.id +'-DPics-desc');
     this.prev = getById(''+ this.oWrap.id +'-DPics-prev');
     this.next = getById(''+ this.oWrap.id +'-DPics-next');
     this.play = getById(''+ this.oWrap.id +'-DPicsPlay');
     this.pause = getById(''+ this.oWrap.id +'-DPicsPause');
     this.loading = getById(''+ this.oWrap.id +'-DPics-loading');
-    this.rotate = getById(''+ this.oWrap.id +'-DPics-rotate');
-    this.rotateBackFace = getById(''+ this.oWrap.id +'-DPics-rotate-backFace');
-    this.backface = getById(''+ this.oWrap.id +'-DPics-backFace');
+    this.close = getById(''+ this.oWrap.id +'-DPics-close');
 
     if(!this.config.showNav){
       this.nav.style.display = 'none';
     }
 
-    if(!this.config.switchItem){
+    if(this.config.singleMode){
       this.prev.style.display =
       this.next.style.display =
       this.play.style.display = 'none';
     }
 
-    if(!this.config.autoPlay || !this.config.switchItem){
+    if(!this.config.autoPlay || this.config.singleMode){
       this.play.style.display = this.pause.style.display = 'none';
     }else{
       this.play.style.display = 'none';

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>DPicsViewer</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <!-- build:css styles/build.css -->
   <link rel="stylesheet" href="styles/DPicsViewer.css">
   <style>
     ul.style{
@@ -28,6 +29,7 @@
       max-height: 100%;
     }
   </style>
+  <!-- endbuild -->
 </head>
 <body>
   <h1>normal-loop</h1>
@@ -42,7 +44,7 @@
     <li><img class="DPics-item" src="images/8.jpg"></li>
   </ul>
   <br>
-  <h1>noNavigation-noLoop</h1>
+  <h1>noNavigation-single</h1>
   <ul id="DPicsNoNav" class="style">
     <li><img class="DPics-item" src="images/1.jpg"></li>
     <li><img class="DPics-item" src="images/2.jpeg"></li>
@@ -52,85 +54,77 @@
     <li><img class="DPics-item" src="images/7.jpg"></li>
   </ul>
 
+  <!-- build:js scripts/build.js -->
   <script src="scripts/DPicsViewer.js"></script>
   <script>
     window.onload = function(){
       var dataNormal = [
         {
           src: 'images/1.jpg',
-          title: 'BEAUTIFUL111',
-          desc: 'Oh!Be my girlfriend111!'
+          title: 'BEAUTIFUL111'
         },
         {
           src: 'images/2.jpeg',
           title: 'BEAUTIFUL222',
-          desc: 'Oh!Be my girlfriend222!'
+          desc: 'Description2: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloremque eius facere magni mollitia nulla porro reiciendis repellendus tempore ullam, vitae! Animi culpa cumque ipsam maxime nobis nostrum quasi repellendus tenetur.'
         },
         {
           src: 'images/3.jpeg',
-          title: 'BEAUTIFUL333',
-          desc: 'Oh!Be my girlfriend333!'
+          title: 'BEAUTIFUL333'
         },
         {
           src: 'images/4.jpg',
           title: 'BEAUTIFUL444',
-          desc: 'Oh!Be my girlfriend444!'
+          desc: 'Description4: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto corporis dignissimos dolore, ducimus esse libero officia quas ratione sapiente, sit soluta tempore, voluptatibus? Doloremque doloribus hic nam nemo ut. Deserunt.'
         },
         {
           src: 'images/5.jpg',
-          title: 'BEAUTIFUL555',
-          desc: 'Oh!Be my girlfriend555!'
+          title: 'BEAUTIFUL555'
+
         },
         {
           src: 'images/6.jpeg',
-          title: 'BEAUTIFUL666',
-          desc: 'Oh!Be my girlfriend666!'
+          title: 'BEAUTIFUL666'
         },
         {
           src: 'images/7.jpg',
           title: 'BEAUTIFUL777',
-          desc: 'Oh!Be my girlfriend777!'
+          desc: 'Description7: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi ipsa laborum nam necessitatibus odit optio placeat, quos? Cum debitis dignissimos eum ipsa nobis nostrum omnis perspiciatis quia suscipit! Quam, reiciendis.'
         },
         {
           src: 'images/8.jpg',
-          title: 'BEAUTIFUL888',
-          desc: 'Oh!Be my girlfriend888!'
+          title: 'BEAUTIFUL888'
         }
       ];
       var dataNoNav = [
         {
           src: 'images/1.jpg',
-          title: 'BEAUTIFUL111',
-          desc: 'Oh!Be my girlfriend111!'
+          title: 'BEAUTIFUL111'
         },
         {
           src: 'images/2.jpeg',
-          title: 'BEAUTIFUL222',
-          desc: 'Oh!Be my girlfriend222!'
+          title: 'BEAUTIFUL222'
         },
         {
           src: 'images/3.jpeg',
-          title: 'BEAUTIFUL333',
-          desc: 'Oh!Be my girlfriend333!'
+          title: 'BEAUTIFUL333'
         },
         {
           src: 'images/5.jpg',
-          title: 'BEAUTIFUL555',
-          desc: 'Oh!Be my girlfriend555!'
+          title: 'BEAUTIFUL555'
         },
         {
           src: 'images/6.jpeg',
-          title: 'BEAUTIFUL666',
-          desc: 'Oh!Be my girlfriend666!'
+          title: 'BEAUTIFUL666'
         },
         {
           src: 'images/7.jpg',
-          title: 'BEAUTIFUL777',
-          desc: 'Oh!Be my girlfriend777!'
+          title: 'BEAUTIFUL777'
         }
       ];
+
       var dpicsNormal = new DPicsViewer('DPicsNormal',{
-        autoResize: false,
+        autoResize: true,
         loop: true,
         keyControl: true,
         autoPlay: true,
@@ -140,12 +134,12 @@
 
       var dpicsNoNav = new DPicsViewer('DPicsNoNav',{
         autoResize: true,
-        loop: false,
-        keyControl: false,
-        showNav: false
+        singleMode: true,
+        showNav: true
       });
       dpicsNoNav.init(dataNoNav);
     }
   </script>
+  <!-- endbuild -->
 </body>
 </html>

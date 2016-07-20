@@ -10,52 +10,22 @@
   left: $l;
 }
 
-.animated {
-  -webkit-animation-duration: 0.5s;
-  animation-duration: 0.5s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
-
-.animated.infinite {
-  -webkit-animation-iteration-count: infinite;
-  animation-iteration-count: infinite;
-}
-
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.fadeIn {
-  -webkit-animation-name: fadeIn;
-  animation-name: fadeIn;
-}
-
 .DPics-wrap{
-  perspective: 1300px;
   display: none;
   z-index: 9999;
   @include pos(fixed,0,0,0,0);
   background: rgba(0,0,0,.7);
+  font-size: 14px;
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 
   @at-root {
     .DPics-box{
-      position: relative;
       opacity: 0;
+      -webkit-backface-visibility: hidden;
+      -moz-backface-visibility: hidden;
+      backface-visibility: hidden;
       @include stretch(50%,auto,auto,50%);
       box-shadow: 0 1px 6px rgba(0,0,0,.2);
       z-index: 99999;
@@ -66,98 +36,98 @@
       pointer-events: auto !important;
       @include border-radius(3px);
       padding: 5px;
-      @include transition(width,height,transform,0.5s);
-      transform-style: preserve-3d;
+      @include transition(all,0.5s);
       img{
         z-index: 90000;
         display: block;
         @include transition(opacity,visibility,.3s);
       }
     }
-    .DPics-box.inverse{
-      @include rotateY(180deg);
+    .DPics-box.fadeIn{
+      opacity: 1;
     }
 
-    .face-desc {
-      z-index: 99900;
-      @include stretch(0, 0, 0, 0);
-      overflow: auto;
-      box-sizing: border-box;
-      transform: rotateY(180deg) translateZ(1px); //firefox
-      -webkit-transform: rotateY(180deg) translateZ(1px); //firefox
-      backface-visibility: hidden;
-      background: #fff;
-      color: #555;
-      padding: 10%;
-      line-height: 1.25;
-      font-size: 18px;
-      text-align: center;
-      @include border-radius(3px);
-    }
+    .DPics-imgBox{
+      z-index: 80050;
+      position: relative;
 
-    .DPics-rotate {
-      cursor: pointer;
-      float: right;
-      width: 36px;
-      height: 36px;
-      margin-right: 5px;
-      background: center no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAExElEQVR4Xu1aTXLUOhDudmZPbkA4AeEEmEizJpyAcALCCRJOwHACkhMQ1pET5wQMJ3i8E/DYy+5X7ZJd9ozs8diS7aqxqrJIxZG6v+7+1D9COPCFB64/zADMHnDgCMwhcOAOMJPgHAJjh8ByuTwloucAcMqyENEJIp4AQGx+/x0Ewa/7+/u1D1kH94AwDE+Ojo7eAkCIiOdtlSKi/wDgDhFvlVIZOC5WIwBhGB7HccwH91q8DyuNiJe5pftsSES/AeBTFEV3ffbh/60FgIVeLBaPWus3XUEwe3wkoktEPO4rrOX/Y631u67yNQIgpQwB4BEA1vuCMIDiBRYmND509YZaD5BSXgPAlTmpNQhCiI8AcO3a4kT0CxHZ9StkSETHiHiapunNw8PDzb5eVguAEOIGEd+XNmwEwXjMFxcxnp9JRLdMfEmSxH3cvAmUJg/4aVHGCoKUkhVngnOx/gLASmu98qV0WcgmAKhGmwIEc4d/c2T1QRXPdbMCUCLAOotyHN4S0ZWjWP+htb6M45hjfNBVBwC7M7u178VWv1ZKrXwfVLe/FQALATqXj4j+DYLg3FeK21bgOg+wEWDbPXd+x1dakiThECS3S5g6AOoIcNd+O//OV1sURRc7P3T8Adcgi8XipSHskIhOkyR5sQVACwLsLNpQyvPtlKbpS1NVZspukjWHYBRFJzYAvBBgmqYfumRqu9AuKcvlNP9wCt9mPSmlwi0AhBArROR01tlypfxyuXydpilbk/sF+yhr0+WzUura5gFca792pX1X5XNlWVHO9R0lW4VaRPSOCygbAC4J8FPbO15KeWW6Qc6VtRlTa/2CE68KACa15SvQ1WpdRZ6dnV0EQcBp9RDrr1Iq609UAPAkxBRByAhwCwAfBGjMOTUQMgLcAkBK6ZQAN3x5MiDkBGgDwCUB2mJ5EiDkBFgBwAMB1pHZ2CAUBFgBwBMBThGEggArAHgkwE0QuAewJqJV206ulJK7021T3MZrlIi+RlFUtO+Ka9AHAXLBYTq5MRGtkyRZ79v1EUJ8Q0Rn1eNmZloAIIT406e9ZZTlVhn/8MCCle01VXKtfObyiK/KTZgMAFMr/9M2BfOhbPlsM0pjy7eeHbaVXSlVSf6yX4QQ54j43bYJd2/YqoiYWdflYNJ2Xj6Sc138mLMqBFiQYD4FGlrZTQA8K8+j9woBFgBwCOxLTm1dru13prHx2IeHdp1lK80Hfx9gE5JzEET84lN5GwFupcK7EPTxd8djtUYRNwlwVABcjtXMrcST4XyabQNiiwBHAcAQHQvqapjKY7ULzjma0nkbAQ4KgIdHE9axWgMI1vacdxKUUr4lIs4znKWzAPBkrG4dptaA8MaWw3QCwLz04nc/f0ySVKS8pm3N/TYuXpwUMHlAc6xz6LQpojZBsBFgrxAw6WqMiDxu8r06vR3IQeAEL4qi7B3i5urkAeVNPJfRnRQvy2dyjLBuHtkbAD7MXGk843cyUGGLcb/A1Sit6b2jEwByxHmwSkSc1XEV92zPuHjiB1Fa67sh03KnAJQVNlNmBiR/+1vBgxskiMjkGfuuMJsM4Q2APa0/2uczAKNBP5GDZw+YiCFGE2P2gNGgn8jBswdMxBCjiXHwHvA/nUrUL60Ns2AAAAAASUVORK5CYII=);
-      background-size: 24px 24px;
-      opacity: .7;
       &:hover{
-        opacity: 1;
+        p.DPics-desc.show-desc{
+          visibility: visible !important;
+          opacity: 1 !important;
+        }
       }
-    }
-    .DPics-rotate-backFace{
-      @extend .DPics-rotate;
-      float: none;
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
+      p.DPics-desc{
+        visibility: hidden;
+        opacity: 0;
+        @include stretch(auto, 0, 0, 0);
+        margin: 0;
+        padding: 14px;
+        color: #e1e1e1;
+        background: rgba(0,0,0,.5);
+        line-height: 1.6;
+        @include transition(opacity,visibility,.3s);
+      }
     }
 
     .DPics-nav{
       @include border-radius(3px);
+      position: relative;
       border: 1px solid #fff;
       margin-top: 5px;
       z-index: 99999;
-      height: 36px;
+      height: auto;
       background: #fff;
-      font:{
-        size: 16px;
-        weight: 500;
-      };
-      @media (max-width: 768px) {
-        font-size: 12px;
+      zoom: 1;
+      font-weight: 500;
+      &:after,&:before{
+        content: '';
+        display: table;
+        clear: both;
       }
       @include transition(opacity,visibility,.3s);
 
-      .DPics-detail{
-        width: 50%;
-        @media (max-width: 768px){
-          width: 40%;
+      .DPics-close {
+        cursor: pointer;
+        @include stretch(0,0,auto,auto);
+        width: 38px;
+        height: 38px;
+        margin-right: 5px;
+        background: center no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAFkUlEQVR4Xu2bzXXcNhCAB9y9x64gSgWRKwglcs+WKohUQeQKIldguQIrHUjnBWWqAisVWK4g1p3YyZv3wH0gFiB+ybUt47gCAcyHwQDzIwbPvLFnLj/8BLAvDVitVn+oc6/X6/t9rGVvGlDXNaoCc873spZJJi3L8kXbtl/HdjQUgM+YMRqUFUBZlgeLxeJvADhpmuZlTgAEDBGvhRBv27Z9jBHW9E0WALQ7i8XiHWPsrJ/EpdKhGqD2lyDeuLTMB1IygKqqTgDgA2PsRciZTgFA8yAiHbHzpmlufAS19YkGIHedBCcAO21KDVAnQ8QbIcR5rDZEAVitVoeI+AEADnXJEfELIl7e3d1d57QBUtOuGGO/GuZ8LIridL1eP4RqQzAAEn6z2XzUVR4AngDgknN+5bOI0CPQj3l8fHxWFAXN8YumCV+LojgKhRAEwCY8Iv4rhDgJsc6xAEhoedvcMMZ+T4XgDUBO+knfeUT8p2marfX32X3qkwKgn6OqqmvG2J86BCHEK9/N8AJABm+5XH7Uz3ys8LkAyHEuAOCdBv6h67ojH8PoBaCqKrL2g11OET4nABpL2gUyyttGt0PTNKcujXQCsAwepfbqYnIcAXW8qqrohvhL/W2z2Zy7bqNRAPKup3N/0A8sDV7po145r0HXTtLfq6p6UA0jPZaEEL+NrXUUQF3XlwBAb/u+PXVdd+hrYOYGQIZ6uVzSW2B7RSLi+6ZpyE4YmxWAHOyz9tVbzjlBSW65j0C/IMOmQdd1pAVGB8oKQB+IXnhCCNr9UTfXl8xUAORReFRfjGNaYAVQVdV/6p3vY1B8hc99C+jz6oabbIHNPTcCMFj+J875wNsLEdbUd0oNkIBJU7e2wLaBRgB1XZOL+Vqx/KOGJAbG1AAM1+It53zHczUC0NWfMfYq1MlwQZkagMmIm1z0HQDS1f2k7P6Xpmm27wCXYL5/nxqAyRiaNnIHQF3X+tvaqDq+gtr6zQRAd5be6O66CcDg/APAzkepwk99CyhvAudmmgC0AKAmLY445/Rb1jaHBtR1XQIAebF9u+ec02/b9kMD0O0ZALgB6DdA13Uvc73+VPJzaIDPUTNpwCwpq2cPIKtBGRnMBXpvGvDNAtCDClO8AucS3vAa3PFp9nYLzAEh6ho0OBHZgiBzCK3dNIOIlimQu7en8BwwdK/W9Kr1cYaswYQ5hEiZw8ertcUDBsEERDxNTUOnCBLzreH8G4M6tnjAwItKTYLECJD6jZ42s8lg04CBE+ETX09dcM7vZT7jsxrTtGnxWFB0EFkFgO/mNjBFtG1BnbGw+MCX/l60wLT7Y5s3lhihjDAlE9QsS3JOMKeqm8YypMwpm3Vg82hdqTFT6nmSAEkOMAbLT8OOHl1ndjgm4ZhDmNAxLIbPGdB1ArBQ9S5ACBUkpr+tgAMAnNrqBCCjKnqWmOr0vAoQYgQK/cZUwOFS/X4OLwASgh4spZ/brutOpwiZ+UAYqVXcif3ZxvMGICdr9cosAKDjQBCy1e/6Cm+pW6KKNe8CDm8AtCgbhFxlqz6CUx9beW5M9UoQgDEI9DdZtkpFzJNogyzVo6LsnSRnjPC05mAAPYTlckmlsNsMsrp7ucva1TJ8Q4UqTX3bdd1ZjC2KAtALa8gjDrSYNAIAqJj5NnRx8rgR4BNbQbacLCl1lwSAFiCzL1S7O/gfIMN5puKlFhGpsNlY1LzZbA5lRRp5ozuF2NqY94yxi9S0fTKAflFUVcIYuzRVc/saN59+vtXoPmNF24CxwSWIC8N16bsmYz8ycoh45Sp8DJ0kmwboE8vKciqvLWNhkNB0bIqiuE5V9eSHUChZtb98q9OZLhHxQK081W4PCsI8IuKDEKINNZwxa5xMA2IWs49vfgLYB/Vvac5nrwH/A5jks25SMF68AAAAAElFTkSuQmCC);
+        background-size: 28px 28px;
+        opacity: .65;
+        &:hover{
+          opacity: 1;
         }
+      }
+
+      .DPics-control{
         float: left;
-        height: 36px;
-        color: #555;
-        text-align: left;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-
-        .DPics-title{
-          height: 36px;
-          line-height: 36px;
-          padding: 0 5px;
-          @media (max-width: 768px) {
-            padding: 0 2px;
-          }
-        }
-
+        margin-right: 5px;
         .DPics-page {
-          @extend .DPics-title;
+          float: left;
           color: #888;
           margin: 0 5px;
+          padding: 0 5px;
+          text-align: center;
+          line-height: 38px;
+        }
+      }
+
+      p.DPics-title {
+        margin: 0 50px 0 0;
+        height: 38px;
+        line-height: 38px;
+        box-sizing: border-box;
+        color: #555;
+        overflow: hidden;
+        -ms-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        @media (max-width: 470px) {
+          width: 100%;
+          padding-left: 10px;
+          float: left;
         }
       }
 
@@ -240,7 +210,7 @@
 .DPics-loading{
   z-index: 80000;
   opacity: 0;
-  @include stretch(0,0,46px,0);
+  @include stretch(0,0,0,0);
   @include transition(opacity,.3s);
 }
 
