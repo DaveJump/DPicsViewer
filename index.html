@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <title>DPicsViewer</title>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <!-- build:css styles/build.css -->
-  <link rel="stylesheet" href="styles/DPicsViewer.css">
-  <!-- endbuild -->
+  <link rel="stylesheet" href="styles/build-362d0ef3ca.css">
   <style>
     ul.style{
       zoom: 1;
@@ -29,34 +27,58 @@
       width: auto;
       max-height: 100%;
     }
+    #page-loading{
+      opacity: 1;
+      z-index: 99999;
+      position: fixed;
+    }
+    #page-loading > .DPics-spinner{
+      margin: -30px 0 0 -100px;
+      width: 200px;
+    }
+    #page-loading > .DPics-spinner > div{
+      background-color: #222;
+    }
   </style>
 </head>
 <body>
-  <h1>normal-loop</h1>
-  <ul id="DPicsNormal" class="style">
-    <li><img class="DPics-item" src="images/1.jpg"></li>
-    <li><img class="DPics-item" src="images/2.jpeg"></li>
-    <li><img class="DPics-item" src="images/3.jpeg"></li>
-    <li><img class="DPics-item" src="images/4.jpg"></li>
-    <li><img class="DPics-item" src="images/5.jpg"></li>
-    <li><img class="DPics-item" src="images/6.jpeg"></li>
-    <li><img class="DPics-item" src="images/7.jpg"></li>
-    <li><img class="DPics-item" src="images/8.jpg"></li>
-  </ul>
-  <br>
-  <h1>noNavigation-single</h1>
-  <ul id="DPicsNoNav" class="style">
-    <li><img class="DPics-item" src="images/1.jpg"></li>
-    <li><img class="DPics-item" src="images/2.jpeg"></li>
-    <li><img class="DPics-item" src="images/3.jpeg"></li>
-    <li><img class="DPics-item" src="images/5.jpg"></li>
-    <li><img class="DPics-item" src="images/6.jpeg"></li>
-    <li><img class="DPics-item" src="images/7.jpg"></li>
-  </ul>
+  <div id="page-loading" class="DPics-loading">
+    <div class="DPics-spinner">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+      <h2>Loading content...</h2>
+    </div>
+  </div>
 
-  <!-- build:js scripts/build.js -->
-  <script src="scripts/DPicsViewer.js"></script>
-  <!-- endbuild -->
+  <div id="demo-wrapper" style="display: none;">
+    <h1>normal-loop</h1>
+    <ul id="DPicsNormal" class="style">
+      <li><img class="DPics-item" src="images/1.jpg"></li>
+      <li><img class="DPics-item" src="images/2.jpeg"></li>
+      <li><img class="DPics-item" src="images/3.jpeg"></li>
+      <li><img class="DPics-item" src="images/4.jpg"></li>
+      <li><img class="DPics-item" src="images/5.jpg"></li>
+      <li><img class="DPics-item" src="images/6.jpeg"></li>
+      <li><img class="DPics-item" src="images/7.jpg"></li>
+      <li><img class="DPics-item" src="images/8.jpg"></li>
+    </ul>
+    <br>
+    <h1>noNavigation-single</h1>
+    <ul id="DPicsNoNav" class="style">
+      <li><img class="DPics-item" src="images/1.jpg"></li>
+      <li><img class="DPics-item" src="images/2.jpeg"></li>
+      <li><img class="DPics-item" src="images/3.jpeg"></li>
+      <li><img class="DPics-item" src="images/5.jpg"></li>
+      <li><img class="DPics-item" src="images/6.jpeg"></li>
+      <li><img class="DPics-item" src="images/7.jpg"></li>
+    </ul>
+  </div>
+
+
+  <script src="scripts/build-441a12473f.js"></script>
   <script>
     window.onload = function(){
       var dataNormal = [
@@ -139,6 +161,9 @@
         showNav: true
       });
       dpicsNoNav.init(dataNoNav);
+
+      document.getElementById('page-loading').style.display = 'none';
+      document.getElementById('demo-wrapper').style.display = 'block';
     }
   </script>
 </body>
